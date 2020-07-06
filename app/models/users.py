@@ -1,5 +1,6 @@
 from ..models import db
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import func
 
 
 class User(db.Model):
@@ -7,10 +8,28 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), nullable=False, unique=True)
-    hashed_password = db.Column(db.String(128), nullable=False)
-    username = db.Column(db.String(255), nullable=False)
     full_name = db.Column(db.String(255), nullable=False)
+    username = db.Column(db.String(255), nullable=False, unique=True)
+    hashed_password = db.Column(db.String(128), nullable=False)
+    profile_image_url = db.Column(db.String(255))
+    bio = db.Column(db.String(2000))
+    created_at = db.Column(db.DateTime(timezone=True),
+                           server_default=func.now(), nullable=False)
+    updated_at = db.Column(db.DateTime(timezone=True),
+                           server_default=func.now(), onupdate=func.now(),
+                           nullable=False)
 
+    posts = db.relationship("Post", back_populates="user")
+    follows = db.relationship("Follow", back_populates="user")
+    follower = db.relationship("Follow", back_populates="follower")
+    messages = db.relationship("Message", back_populates="user")
+    messaged = db.relationship("Message", back_populates="messaged")
+    likes = db.relationship("Like", back_populates="user")
+    liked = db.relationship("Like", back_populates="liked")
+    saved = db.relationship("Saved_Post", back_populates="user")
+    comments = db.relationship("Comment", back_populates="user")
+    user_conversations = (db.relationship("User_Conversation",
+                          back_populates="user"))
 
     @property
     def password(self):
