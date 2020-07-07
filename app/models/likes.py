@@ -9,7 +9,7 @@ class Like(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     likeable_id = db.Column(db.Integer,
                             nullable=False)
-    likeable_type = db.Column(db.Integer, nullable=False)
+    likeable_type = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True),
                            server_default=func.now(), nullable=False)
     updated_at = db.Column(db.DateTime(timezone=True),

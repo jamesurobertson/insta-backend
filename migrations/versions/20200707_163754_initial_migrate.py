@@ -1,8 +1,8 @@
 """initial migrate
 
-Revision ID: b06ab73270f0
+Revision ID: a02de7d67f1f
 Revises: 
-Create Date: 2020-07-07 12:35:16.602679
+Create Date: 2020-07-07 16:37:54.840235
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b06ab73270f0'
+revision = 'a02de7d67f1f'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -61,7 +61,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('likeable_id', sa.Integer(), nullable=False),
-    sa.Column('likeable_type', sa.Integer(), nullable=False),
+    sa.Column('likeable_type', sa.String(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
@@ -107,8 +107,7 @@ def upgrade():
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['post_id'], ['posts.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('content')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('saved_posts',
     sa.Column('id', sa.Integer(), nullable=False),

@@ -10,7 +10,7 @@ class Comment(db.Model):
                         nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey(
         "posts.id"), nullable=False)
-    content = db.Column(db.String(2000), nullable=False, unique=True)
+    content = db.Column(db.String(2000), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True),
                            server_default=func.now(), nullable=False)
     updated_at = db.Column(db.DateTime(timezone=True),
