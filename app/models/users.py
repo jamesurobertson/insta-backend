@@ -21,15 +21,12 @@ class User(db.Model):
 
     posts = db.relationship("Post", back_populates="user")
     follows = db.relationship("Follow", back_populates="user")
-    follower = db.relationship("Follow", back_populates="follower")
     messages = db.relationship("Message", back_populates="user")
-    messaged = db.relationship("Message", back_populates="messaged")
     likes = db.relationship("Like", back_populates="user")
-    liked = db.relationship("Like", back_populates="liked")
     saved = db.relationship("Saved_Post", back_populates="user")
     comments = db.relationship("Comment", back_populates="user")
     user_conversations = (db.relationship("User_Conversation",
-                          back_populates="user"))
+                                          back_populates="user"))
 
     @property
     def password(self):
@@ -43,4 +40,6 @@ class User(db.Model):
         return check_password_hash(self.hashed_password, password)
 
     def to_dict(self):
-        return {"id": self.id, "email": self.email}
+        return {"id": self.id, "email": self.email, "full_name": self.full_name, "username": self.username,
+                "profile_image_url": self.profile_image_url,
+                "bio": self.bio}

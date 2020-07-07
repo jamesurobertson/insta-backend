@@ -18,4 +18,4 @@ class Post(db.Model):
 
     user = db.relationship("User", back_populates="posts")
     saved = db.relationship("Saved_Post", back_populates="post")
-    comments = db.relationship("Comments", back_populates="post")
+    comments = db.relationship("Comment", back_populates="post")
