@@ -7,7 +7,7 @@ class Like(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    likeable_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+    likeable_id = db.Column(db.Integer,
                             nullable=False)
     likeable_type = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True),
@@ -17,4 +17,3 @@ class Like(db.Model):
                            nullable=False)
 
     user = db.relationship("User", back_populates="likes")
-    liked = db.relationship("User", back_populates="liked")
