@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 import jwt
+import re
 
 from app.models import db
 from app.models.users import User
@@ -9,10 +10,26 @@ from ..auth import require_auth
 
 bp = Blueprint("session", __name__, url_prefix='/api/session')
 
+def checkPassword(password):
+    if len(password) < 8:
+        return "Password must be 8 characters long"
+    elif not re.search('[a-z]', password):
+        return "Password must have a lowercase character"
+    elif not re.search('[A-Z]', password):
+        return "Password must have an uppcase character"
+    elif not re.search('[0-9]', password):
+        return "Password must have a digit"
+    else:
+        return True
+
 
 @bp.route('', methods=["POST"])
 def login():
     data = request.json
+    if not data['username']:
+        return {"error": "Please provide a Username"}, 401
+    if not data['password']:
+        return{ "error": "Please provide a Password"}, 401
     user = User.query.filter(User.username == data['username']).first()
     if not user:
         return {"error": "Username not found"}, 422
@@ -44,15 +61,39 @@ def check():
 @bp.route('/register', methods=["POST"])
 def register():
     data = request.json
+    print(data)
+    if not data['username']:
+        return {"error": 'Please provide a Username'}, 401
+    if User.query.filter(User.username == data['username']).first():
+        return {"error": 'Username already exists'}, 401
+    if not data['email']:
+        return {"error": 'Please provide an Email'}, 401
+    if User.query.filter(User.email == data['email']).first():
+        return {"error": 'Email already exists'}, 401
+    if not data['fullName']:
+        return {'error': "Please provide your Full Name"}, 401
+    if not data['password']:
+        return {'error': "Please proivde a Password"}, 401
+    if checkPassword(data['password']) != True:
+        return {'error': checkPassword(data['password'])}, 401
+    if not data['confirmPassword']:
+        return {'error': "Please Confirm your Password"}, 401
+    if data['password'] != data['confirmPassword']:
+        return {'error': "Passwords do not match"}, 401
+    
     print(f"\n\n\nDATA\n{data}\n\n\n")
-    user = User(birthday=data['birthday'], password=data['password'], email=data['email'],
-                full_name=data['fullName'], username=data['username'])
-    print(user)
-    db.session.add(user)
-    db.session.commit()
+    try:
+        user = User(password=data['password'], email=data['email'],
+                    full_name=data['fullName'], username=data['username'])
+        print(user)
+        db.session.add(user)
+        db.session.commit()
+        access_token=jwt.encode({'email': user.email}, Configuration.SECRET_KEY)
+        return {'access_token': access_token.decode('UTF-8'), 'user': user.to_dict()}
+    except AssertionError as message:
+        print(str(message))
+        return jsonify({"error": str(message)}), 400
 
-    access_token=jwt.encode({'email': user.email}, Configuration.SECRET_KEY)
-    return {'access_token': access_token.decode('UTF-8'), 'user': user.to_dict()}
 
 
 @ bp.route('', methods = ["DELETE"])
