@@ -27,6 +27,6 @@ def getFollowing(id):
 
     followsList = []
     for follower in follows:
-        user = User.query.filter(follower.user_id == User.id).first()
+        user = User.query.filter(follower.user_followed_id == User.id).first()
         followsList.append(user.to_dict())
     return {"users": followsList}
