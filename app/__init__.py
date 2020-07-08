@@ -13,4 +13,4 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 app.register_blueprint(session.bp)
-app.register_blueprint(post.bp)
+# app.register_blueprint(post.bp)
