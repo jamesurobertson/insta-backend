@@ -1,7 +1,7 @@
 from ..models import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
-
+from sqlalchemy.orm import validates
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -27,6 +27,22 @@ class User(db.Model):
     comments = db.relationship("Comment", back_populates="user")
     user_conversations = (db.relationship("User_Conversation",
                                           back_populates="user"))
+
+    @validates('username', 'email')
+    def validate_username(self, key, value):
+        if key == 'username':
+            if not value:
+                raise AssertionError('Must provide a username!')
+            if User.query.filter(User.username == value).first():
+                raise AssertionError('Username already exists!')
+        if key == 'email':
+            if not value:
+                raise AssertionError('Must provide an email!')
+            if User.query.filter(User.email == value).first():
+                raise AssertionError('Email already exists!')
+
+
+        return value
 
     @property
     def password(self):
