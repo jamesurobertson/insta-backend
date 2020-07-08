@@ -15,7 +15,7 @@ bp = Blueprint("like", __name__, url_prefix="/api/like")
 @bp.route('/<likeableType>/<id>')
 def getFollows(likeableType, id):
     likes = Like.query.filter(
-        Like.likeable_id == id and Like.likeable_type == likeableType).all()
+        Like.likeable_id == id).filter(Like.likeable_type == likeableType).all()
 
     likesList = []
     for like in likes:

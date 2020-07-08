@@ -3,6 +3,7 @@ import jwt
 
 from app.models import db
 from app.models.users import User
+from app.models.follows import Follow
 from ..config import Configuration
 from ..auth import require_auth
 
@@ -31,7 +32,12 @@ def check():
 
         user = User.query.filter(
             User.email == decoded.get('email')).first()
-        return {'user': user.to_dict()}
+        num_following = Follow.query.filter(Follow.user_id == user.id).count()
+        num_followers = Follow.query.filter(Follow.user_followed_id == user.id).count()
+        user_dict = user.to_dict()
+        user_dict['numFollowing'] = num_following
+        user_dict['numFollowers'] = num_followers
+        return {'user': user_dict}
     except:
         return {'error': 'invalid auth token'}, 401
 
