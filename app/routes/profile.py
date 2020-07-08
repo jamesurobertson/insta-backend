@@ -37,4 +37,4 @@ def index(id):
         post_dict["like_count"] = likes
         post_dict["comment_count"] = comments
         plist.append(post_dict)
-    return {"num_posts": post_count, "posts": plist, "followersList": followersList, "followsList": followsList, "user": user.to_dict() }
+    return {"num_posts": post_count, "posts": plist, "followersList": followersList, "followingList": followsList, "user": user.to_dict() }
