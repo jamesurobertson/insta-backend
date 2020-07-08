@@ -25,8 +25,7 @@ def login():
 
 @bp.route('/check', methods=["POST"])
 def check():
-    data = request.json
-    decoded = jwt.decode(data['access_token'], Configuration.SECRET_KEY)
+    data=request.json
     try:
         decoded = jwt.decode(data['access_token'], Configuration.SECRET_KEY)
 
@@ -40,7 +39,7 @@ def check():
 def register():
     data = request.json
     print(f"\n\n\nDATA\n{data}\n\n\n")
-    user = User(password=data['password'], email=data['email'],
+    user = User(birthday=data['birthday'], password=data['password'], email=data['email'],
                 full_name=data['fullName'], username=data['username'])
     print(user)
     db.session.add(user)
