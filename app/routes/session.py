@@ -23,6 +23,18 @@ def login():
     else:
         return {"error": "Incorrect password"}, 401
 
+@bp.route('/check', methods=["POST"])
+def check():
+    data=request.json
+    decoded = jwt.decode(data['access_token'], Configuration.SECRET_KEY)
+    try:
+        decoded = jwt.decode(data['access_token'], Configuration.SECRET_KEY)
+        
+        user = User.query.filter(
+            User.email == decoded.get('email')).first()
+        return {'user': user.to_dict()}
+    except:
+        return {'error': 'invalid auth token'}, 401
 
 @bp.route('/register', methods=["POST"])
 def register():
