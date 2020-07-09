@@ -22,4 +22,4 @@ class Post(db.Model):
 
     def to_dict(self):
         return {"id": self.id, "user_id": self.user_id, "image_url": self.image_url,
-                "caption": self.caption}
+                "caption": self.caption, "created_at": self.created_at}
