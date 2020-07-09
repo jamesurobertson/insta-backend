@@ -33,6 +33,12 @@ def login():
     user = User.query.filter(User.username == data['username']).first()
     if not user:
         return {"error": "Username not found"}, 422
+    num_following = Follow.query.filter(Follow.user_id == user.id).count()
+    num_followers = Follow.query.filter(
+        Follow.user_followed_id == user.id).count()
+    user_dict = user.to_dict()
+    user_dict['numFollowing'] = num_following
+    user_dict['numFollowers'] = num_followers
 
     if user.check_password(data['password']):
         access_token = jwt.encode(
@@ -83,11 +89,17 @@ def register():
     
     print(f"\n\n\nDATA\n{data}\n\n\n")
     try:
-        user = User(password=data['password'], email=data['email'],
+        user = User(profile_image_url='https://www.pngitem.com/pimgs/m/421-4212266_transparent-default-avatar-png-default-avatar-images-png.png', password=data['password'], email=data['email'],
                     full_name=data['fullName'], username=data['username'])
-        print(user)
+        
         db.session.add(user)
         db.session.commit()
+        num_following = Follow.query.filter(Follow.user_id == user.id).count()
+        num_followers = Follow.query.filter(
+            Follow.user_followed_id == user.id).count()
+        user_dict = user.to_dict()
+        user_dict['numFollowing'] = num_following
+        user_dict['numFollowers'] = num_followers
         access_token=jwt.encode({'email': user.email}, Configuration.SECRET_KEY)
         return {'access_token': access_token.decode('UTF-8'), 'user': user.to_dict()}
     except AssertionError as message:
