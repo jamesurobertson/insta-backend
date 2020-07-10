@@ -12,14 +12,20 @@ bp = Blueprint("posts", __name__, url_prefix="/api/post")
 
 
 @bp.route('/scroll/<length>')
-def explore_feed(length):
+def index(length):
     length = int(length)
     post_list = []
     posts = Post.query.all()
     for post in posts:
-        post_list.append(post.to_dict())
-
-    return {"posts": post_list[length : (length + 3)]}
+        post_dict = post.to_dict()
+        likes = Like.query.filter(
+            Like.likeable_id == post_dict["id"] and Like.likeableType == 'post').count()
+        comments = Comment.query.filter(
+            Comment.post_id == post_dict["id"]).count()
+        post_dict["like_count"] = likes
+        post_dict["comment_count"] = comments
+        post_list.append(post_dict)
+    return {"posts": post_list[length: (length + 3)]}
 
 @bp.route('/<id>/scroll/<length>')
 def home_feed(id, length):

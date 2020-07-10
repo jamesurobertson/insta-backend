@@ -55,11 +55,12 @@ def check():
 
         user = User.query.filter(
             User.email == decoded.get('email')).first()
-        num_following = Follow.query.filter(Follow.user_id == user.id).count()
-        num_followers = Follow.query.filter(Follow.user_followed_id == user.id).count()
+        following_arr = Follow.query.filter(Follow.user_id == user.id).all()
+        followers_arr = Follow.query.filter(Follow.user_followed_id == user.id).all()
         user_dict = user.to_dict()
-        user_dict['numFollowing'] = num_following
-        user_dict['numFollowers'] = num_followers
+        user_dict['numFollowing'] = len(following_arr)
+        user_dict['numFollowers'] = len(followers_arr)
+
         return {'user': user_dict}
     except:
         return {'error': 'invalid auth token'}, 401
@@ -86,12 +87,12 @@ def register():
         return {'error': "Please Confirm your Password"}, 401
     if data['password'] != data['confirmPassword']:
         return {'error': "Passwords do not match"}, 401
-    
+
     print(f"\n\n\nDATA\n{data}\n\n\n")
     try:
         user = User(profile_image_url='https://www.pngitem.com/pimgs/m/421-4212266_transparent-default-avatar-png-default-avatar-images-png.png', password=data['password'], email=data['email'],
                     full_name=data['fullName'], username=data['username'])
-        
+
         db.session.add(user)
         db.session.commit()
         num_following = Follow.query.filter(Follow.user_id == user.id).count()
