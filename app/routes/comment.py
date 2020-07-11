@@ -1,9 +1,16 @@
-@bp.route('', methods= ["POST"])
+from flask import Blueprint, request
+from ..models import db
+from ..models.comments import Comment
+
+bp = Blueprint("comment", __name__, url_prefix="/api/comment")
+
+
+@bp.route('', methods=["POST"])
 def postComment():
     data = request.json
     print(data)
-    content = Comment(user_id=data['userId'], post_id=data['postId'], content=data['content'])
-    db.session.add(content)
+    comment = Comment(user_id=data['userId'], post_id=data['postId'], content=data['content'])
+    db.session.add(comment)
     db.session.commit()
 
-    return content.to_dict()
+    return comment.to_dict()
