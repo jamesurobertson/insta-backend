@@ -4,7 +4,7 @@ from flask_cors import CORS
 
 from app.config import Configuration
 
-from app.routes import session, comment, profile, follow, like, post, user, notification
+from app.routes import session, comment, profile, follow, like, post, user, notification, search
 
 from app.models import db
 
@@ -22,3 +22,5 @@ app.register_blueprint(post.bp)
 app.register_blueprint(notification.bp)
 app.register_blueprint(user.bp)
 app.register_blueprint(comment.bp)
+app.register_blueprint(search.bp)
+
