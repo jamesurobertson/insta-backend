@@ -19,4 +19,4 @@ class Follow(db.Model):
     user = db.relationship("User", back_populates="follows")
 
     def to_dict(self):
-        return {"id": self.id, "user_id": self.user_id, "user_followed_id": self.user_followed_id}
+        return {"id": self.id, "user_id": self.user_id, "user_followed_id": self.user_followed_id, "created_at": self.created_at}

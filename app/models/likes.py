@@ -17,3 +17,8 @@ class Like(db.Model):
                            nullable=False)
 
     user = db.relationship("User", back_populates="likes")
+
+
+    def to_dict(self):
+        return {"id": self.id, "user_id": self.user_id, "likeable_id": self.likeable_id, "likeable_type": self.likeable_type,
+                "created_at": self.created_at}
