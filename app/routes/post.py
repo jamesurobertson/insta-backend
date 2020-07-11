@@ -11,6 +11,22 @@ from ..auth import require_auth
 bp = Blueprint("posts", __name__, url_prefix="/api/post")
 
 
+@bp.route('/scroll/init')
+def inital():  
+    post_list = []
+    posts = Post.query.all()
+    for post in posts:
+        post_dict = post.to_dict()
+        likes = Like.query.filter(
+            Like.likeable_id == post_dict["id"] and Like.likeableType == 'post').count()
+        comments = Comment.query.filter(
+            Comment.post_id == post_dict["id"]).count()
+        post_dict["like_count"] = likes
+        post_dict["comment_count"] = comments
+        post_list.append(post_dict)
+    return {"posts": post_list[0:12]}
+
+
 @bp.route('/scroll/<length>')
 def index(length):
     length = int(length)
@@ -79,10 +95,6 @@ def home_feed(id, length):
 @bp.route('/<post_id>')
 def get_post(post_id):
 
-    post = Post.query.filter(Post.id == post_id).first()
-    post_dict = post.to_dict()
-    post_dict['user'] = post.user.to_dict()
-
     comments = post.comments
     comments_list = []
 
@@ -92,13 +104,13 @@ def get_post(post_id):
         comment_likes = Like.query.filter(Like.likeable_type == "comment").filter(Like.likeable_id == comment.id).all()
         user_list = []
         for like in comment_likes:
-            username = like.user.to_dict()
-            user_list.append(username)
+            user = like.user.to_dict()
+            user_list.append(user)
 
         comment_dict['likes_comment'] = user_list
 
         user = comment.user
-        comment_dict["username"] = user.to_dict()
+        comment_dict["user"] = user.to_dict()
         comments_list.append(comment_dict)
 
     likes = Like.query.filter(Like.likeable_type == "post").filter(Like.likeable_id == post_id).all()
@@ -109,4 +121,4 @@ def get_post(post_id):
         user_list.append(user)
 
 
-    return {"post": post_dict, "comments": comments_list, "likes_post": user_list}
+    return {"post": post.to_dict(), "comments": comments_list, "likes_post": user_list}
