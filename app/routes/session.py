@@ -68,7 +68,7 @@ def check():
 @bp.route('/register', methods=["POST"])
 def register():
     data = request.json
-    print(data)
+    
     if not data['username']:
         return {"error": 'Please provide a Username'}, 401
     if User.query.filter(User.username == data['username']).first():
