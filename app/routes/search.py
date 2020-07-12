@@ -26,6 +26,6 @@ def query():
         user_dict = user.to_dict()
         results.append(user_dict)
 
-    return {"result": results}
+    return {"results": results}
 
 
