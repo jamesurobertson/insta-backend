@@ -131,21 +131,3 @@ def get_post(post_id):
 
 
     return {"post": post_dict, "comments": comments_list, "likes_post": user_list}
-
-
-@bp.route('/upload', methods=["POST"])
-def upload():
-
-    data=request.json
-    temp_image_url=data['imageURL']
-    image_url='www.futureAWSURL???'
-
-    try:
-        post= Post(user_id=data['currentUserId'], image_url=image_url, caption=data['caption'])
-        db.session.add(post)
-        db.session.commit()
-        post_dict = post.to_dict()
-        return post_dict
-    except AssertionError as message:
-        print(str(message))
-        return jsonify({"error": str(message)}), 400
