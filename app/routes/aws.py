@@ -4,6 +4,7 @@ import time
 from flask import Blueprint, request
 from ..models import db
 from ..models.users import User
+from ..models.posts import Post
 
 bp = Blueprint("aws", __name__, url_prefix="/api/aws")
 
@@ -24,9 +25,8 @@ def upload(id):
         return {"img": f'https://slickpics.s3.us-east-2.amazonaws.com/uploads/{f.filename}'}
 
 
-@bp.route('/post/<currentUserId>/<content>', methods=["POST"])
-def upload_post(currentUserId, content):
-    print(request.files)
+@bp.route('/post/<current_user_id>/<content>', methods=["POST"])
+def upload_post(current_user_id, content):
     f = request.files['file']
     f.filename = change_name(f.filename)
     f.save(os.path.join(UPLOAD_FOLDER, f.filename))
@@ -34,7 +34,7 @@ def upload_post(currentUserId, content):
     image_url = f'https://slickpics.s3.us-east-2.amazonaws.com/uploads/{f.filename}'
 
     try:
-        post= Post(user_id=data['currentUserId'], image_url=image_url, caption=data['caption'])
+        post = Post(user_id=current_user_id, image_url=image_url, caption=content)
         db.session.add(post)
         db.session.commit()
         post_dict = post.to_dict()
@@ -43,7 +43,7 @@ def upload_post(currentUserId, content):
         print(str(message))
         return jsonify({"error": str(message)}), 400
 
-    return {"img": f'https://slickpics.s3.us-east-2.amazonaws.com/uploads/{f.filename}'}
+    return post.to_dict()
 
 
 def upload_file(file_name, bucket):
