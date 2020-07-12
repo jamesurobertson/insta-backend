@@ -12,7 +12,7 @@ bp = Blueprint("posts", __name__, url_prefix="/api/post")
 
 
 @bp.route('/scroll/init')
-def inital():  
+def inital():
     post_list = []
     posts = Post.query.all()
     for post in posts:
@@ -101,6 +101,9 @@ def home_feed(id, length):
 @bp.route('/<post_id>')
 def get_post(post_id):
 
+    post = Post.query.filter(Post.id == post_id).first()
+    post_dict = post.to_dict()
+    post_dict["user"] = post.user.to_dict()
     comments = post.comments
     comments_list = []
 
@@ -116,7 +119,7 @@ def get_post(post_id):
         comment_dict['likes_comment'] = user_list
 
         user = comment.user
-        comment_dict["user"] = user.to_dict()
+        comment_dict["username"] = user.to_dict()
         comments_list.append(comment_dict)
 
     likes = Like.query.filter(Like.likeable_type == "post").filter(Like.likeable_id == post_id).all()
@@ -127,12 +130,12 @@ def get_post(post_id):
         user_list.append(user)
 
 
-    return {"post": post.to_dict(), "comments": comments_list, "likes_post": user_list}
+    return {"post": post_dict, "comments": comments_list, "likes_post": user_list}
 
 
 @bp.route('/upload', methods=["POST"])
 def upload():
-    
+
     data=request.json
     temp_image_url=data['imageURL']
     image_url='www.futureAWSURL???'
