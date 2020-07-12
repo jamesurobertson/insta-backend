@@ -18,6 +18,7 @@ def index(id):
     follows = Follow.query.filter(Follow.user_id == id).all()
     user = User.query.filter(User.id == id).first()
     posts = Post.query.filter(Post.user_id == id).all()
+    posts.reverse()
     plist = []
 
     followersList = []
