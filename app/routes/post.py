@@ -45,8 +45,12 @@ def home_feed(id, length):
                 found_users[post.user_id] = {"username": user.username, "profilePic": user.profile_image_url}
                 post_dict["user_info"] = found_users[post.user_id]
 
-            like_count = Like.query.filter(Like.likeable_id == post.id).filter(Like.likeable_type == 'post').count()
-            post_dict['likeCount'] = like_count
+            likes = Like.query.filter(Like.likeable_id == post.id).filter(Like.likeable_type == 'post').all()
+            post_dict['likeCount'] = len(likes)
+            likes_list = []
+            for like in likes:
+                likes_list.append(like.user.to_dict())
+            post_dict['likesList'] = likes_list
 
             comments = Comment.query.filter(Comment.post_id == post.id).all()
             original_comments = comments
@@ -55,11 +59,13 @@ def home_feed(id, length):
             comments_list = []
             for comment in comments:
                 comment_dict = comment.to_dict()
-                likes = Like.query.filter(Like.likeable_type == 'comment').filter(Like.likeable_id == comment.id).first()
-                if likes:
-                    comment_dict["likesComment"] = True
-                else:
-                    comment_dict["likesComment"] = False
+                comment_likes = Like.query.filter(Like.likeable_type == "comment").filter(Like.likeable_id == comment.id).all()
+                user_list = []
+                for like in comment_likes:
+                    username = like.user.to_dict()
+                    user_list.append(username)
+
+                comment_dict['likes_comment'] = user_list
 
                 if comment.user_id in found_users:
                     comment_dict["username"] = found_users[comment.user_id]
