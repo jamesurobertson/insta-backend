@@ -38,3 +38,13 @@ def update_user():
 
     access_token = jwt.encode({'email': user.email}, Configuration.SECRET_KEY)
     return {'access_token': access_token.decode('UTF-8'), 'user': user.to_dict()}
+
+
+@bp.route('/<id>/resetImg')
+def resetImg(id):
+    user = User.query.filter(User.id == id).first()
+
+    user.profile_image_url = 'https://slickpics.s3.us-east-2.amazonaws.com/uploads/SunJul121903512020.png'
+    db.session.commit()
+
+    return user.to_dict()
