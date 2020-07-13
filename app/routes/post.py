@@ -32,6 +32,7 @@ def index(length):
     length = int(length)
     post_list = []
     posts = Post.query.all()
+    posts.reverse()
     for post in posts:
         post_dict = post.to_dict()
         likes = Like.query.filter(
