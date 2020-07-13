@@ -43,7 +43,7 @@ with app.app_context():
         email = f'{username}@isntgram.com'
 
         user = User(full_name=name, username=username, password='Test@1234',
-                    email=email, profile_image_url=defaultPic)
+                    email=email, profile_image_url=defaultPic, bio=fake.text())
         users.append(user)
 
     follows = []
@@ -79,7 +79,7 @@ with app.app_context():
 
     likes = []
 
-    for i in range(1, 688):
+    for i in range(1, 658):
         users_liked_set = set()
         like_post_count = randint(0, 15)
         while len(users_liked_set) < like_post_count:
@@ -88,9 +88,6 @@ with app.app_context():
                 continue
             likes.append(Like(user_id=userId, likeable_id=i, likeable_type='post'))
             users_liked_set.add(userId)
-
-
-
 
     for user in users:
         db.session.add(user)

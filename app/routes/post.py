@@ -46,7 +46,7 @@ def home_feed(id, length):
             if post.user_id in found_users:
                 post_dict["user_info"] = found_users[post.user_id]
             else:
-                user = User.query.filter(User.id == post.user_id).first()
+                user = post.user
                 found_users[post.user_id] = {"username": user.username, "profilePic": user.profile_image_url}
                 post_dict["user_info"] = found_users[post.user_id]
 
@@ -57,7 +57,7 @@ def home_feed(id, length):
                 likes_list.append(like.user.to_dict())
             post_dict['likesList'] = likes_list
 
-            comments = Comment.query.filter(Comment.post_id == post.id).all()
+            comments = post.comments
             original_comments = comments
             if len(comments) > 2:
                 comments = comments[-2:]
@@ -75,7 +75,7 @@ def home_feed(id, length):
                 if comment.user_id in found_users:
                     comment_dict["username"] = found_users[comment.user_id]
                 else:
-                    user = User.query.filter(User.id == comment.user_id).first()
+                    user = comment.user
                     found_users[user.id] = {"username": user.username, "profilePic": user.profile_image_url}
                     comment_dict["username"] = found_users[comment.user_id]
 
@@ -84,7 +84,9 @@ def home_feed(id, length):
             post_dict["comments"] = {"total": len(original_comments), "commentsList": comments_list }
 
             post_list.append(post_dict)
-    return {"posts": post_list[length: (length + 3)]}
+            if len(post_list) == 3:
+                return {"posts": post_list}
+    return {"posts": post_list}
 
 
 @bp.route('/<post_id>')
