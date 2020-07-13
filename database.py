@@ -20,7 +20,7 @@ fake = Faker()
 # so that the environment variables are
 # properly loaded.
 
-defaultPic = 'https://slickpics.s3.us-east-2.amazonaws.com/uploads/SunJul122059252020.png'
+defaultPic = 'https://randomuser.me/api/portraits/'
 
 with app.app_context():
     db.drop_all()
@@ -41,9 +41,10 @@ with app.app_context():
         name = fake.name()
         username = f"{name.replace(' ', '')}{randint(1,1000)}"
         email = f'{username}@isntgram.com'
-
+        men_or_women = 'men' if randint(1,2) % 2 == 0 else 'women'
+        userPic = f'{defaultPic}{men_or_women}/{i}.jpg'
         user = User(full_name=name, username=username, password='Test@1234',
-                    email=email, profile_image_url=defaultPic, bio=fake.text())
+                    email=email, profile_image_url=userPic, bio=fake.text())
         users.append(user)
 
     follows = []
