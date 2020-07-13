@@ -7,32 +7,19 @@ from ..models.follows import Follow
 from ..models.likes import Like
 from ..models.comments import Comment
 from ..auth import require_auth
+from random import randint
 
 bp = Blueprint("posts", __name__, url_prefix="/api/post")
-
-
-@bp.route('/scroll/init')
-def inital():
-    post_list = []
-    posts = Post.query.all()
-    for post in posts:
-        post_dict = post.to_dict()
-        likes = Like.query.filter(
-            Like.likeable_id == post_dict["id"] and Like.likeableType == 'post').count()
-        comments = Comment.query.filter(
-            Comment.post_id == post_dict["id"]).count()
-        post_dict["like_count"] = likes
-        post_dict["comment_count"] = comments
-        post_list.append(post_dict)
-    return {"posts": post_list[0:12]}
 
 
 @bp.route('/scroll/<length>')
 def index(length):
     length = int(length)
     post_list = []
-    posts = Post.query.all()
-    posts.reverse()
+    post_num = Post.query.count()
+    posts = []
+    rand_int = randint(1, post_num-3)
+    posts = Post.query.filter(Post.id > rand_int).limit(3).all()
     for post in posts:
         post_dict = post.to_dict()
         likes = Like.query.filter(
@@ -42,16 +29,17 @@ def index(length):
         post_dict["like_count"] = likes
         post_dict["comment_count"] = comments
         post_list.append(post_dict)
-    return {"posts": post_list[length: (length + 3)]}
+    return {"posts": post_list}
+
 
 @bp.route('/<id>/scroll/<length>')
 def home_feed(id, length):
     length = int(length)
     post_list = []
     followed_users = Follow.query.filter(Follow.user_id == id).all()
-    print(followed_users)
     for followed in followed_users:
-        posts = Post.query.filter(Post.user_id == followed.user_followed_id).all()
+        posts = Post.query.filter(Post.user_id == followed.user_followed_id).slice(length, length + 3)
+        print(len(list(posts)))
         found_users = {}
         for post in posts:
             post_dict = post.to_dict()
