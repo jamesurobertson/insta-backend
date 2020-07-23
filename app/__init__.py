@@ -38,7 +38,7 @@ def catch_all(path):
     # our static build folder, serve that file
     # This could be useful if we have images, audio, etc., that we want to have
     # available as static resources
-    if path and os.path.exists(f'./client/build/static/{path}'):
+    if path and (os.path.exists(f'./client/build/static/{path}') or os.path.exists(f'./client/build/{path}')):
         return send_from_directory(os.path.join(path_dir), path)
     # Otherwise, serve up the index.html. Our React router will handle any other routes
     else:
