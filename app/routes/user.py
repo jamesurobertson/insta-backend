@@ -44,7 +44,7 @@ def update_user():
 def resetImg(id):
     user = User.query.filter(User.id == id).first()
 
-    user.profile_image_url = 'https://slickpics.s3.us-east-2.amazonaws.com/uploads/SunJul121903512020.png'
+    user.profile_image_url = 'https://slickpics.s3.us-east-2.amazonaws.com/uploads/FriJul171300242020.png'
     db.session.commit()
 
     return user.to_dict()

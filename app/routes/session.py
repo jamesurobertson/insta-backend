@@ -92,16 +92,19 @@ def register():
     try:
         user = User(profile_image_url='https://slickpics.s3.us-east-2.amazonaws.com/uploads/ThuJul230130552020.png', password=data['password'], email=data['email'],
                     full_name=data['fullName'], username=data['username'])
+
+        db.session.add(user)
+
         follows = [
-            Follow(user_id=user.id, user_followed_id=1),
-            Follow(user_id=user.id, user_followed_id=2),
-            Follow(user_id=user.id, user_followed_id=3)
+            Follow(user_followed_id=1),
+            Follow(user_followed_id=2),
+            Follow(user_followed_id=3)
         ]
 
         for follow in follows:
+            follow.user = user
             db.session.add(follow)
 
-        db.session.add(user)
         db.session.commit()
         num_following = Follow.query.filter(Follow.user_id == user.id).count()
         num_followers = Follow.query.filter(
