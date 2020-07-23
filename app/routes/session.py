@@ -68,7 +68,7 @@ def check():
 @bp.route('/register', methods=["POST"])
 def register():
     data = request.json
-    
+
     if not data['username']:
         return {"error": 'Please provide a Username'}, 401
     if User.query.filter(User.username == data['username']).first():
@@ -90,8 +90,16 @@ def register():
 
     print(f"\n\n\nDATA\n{data}\n\n\n")
     try:
-        user = User(profile_image_url='https://www.pngitem.com/pimgs/m/421-4212266_transparent-default-avatar-png-default-avatar-images-png.png', password=data['password'], email=data['email'],
+        user = User(profile_image_url='https://slickpics.s3.us-east-2.amazonaws.com/uploads/ThuJul230130552020.png', password=data['password'], email=data['email'],
                     full_name=data['fullName'], username=data['username'])
+        follows = [
+            Follow(user_id=user.id, user_followed_id=1),
+            Follow(user_id=user.id, user_followed_id=2),
+            Follow(user_id=user.id, user_followed_id=3)
+        ]
+
+        for follow in follows:
+            db.session.add(follow)
 
         db.session.add(user)
         db.session.commit()
