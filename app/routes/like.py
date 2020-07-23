@@ -36,7 +36,9 @@ def post_like():
 @bp.route('', methods=["DELETE"])
 def delete_like():
     data = request.json
+    print(data)
     like = Like.query.filter(Like.user_id == data["userId"]).filter(Like.likeable_id == data["id"]).filter(Like.likeable_type == data["likeableType"]).first()
+    print(like)
     user = like.user
     db.session.delete(like)
     db.session.commit()

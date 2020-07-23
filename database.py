@@ -35,7 +35,10 @@ with app.app_context():
              profile_image_url=defaultPic),
         User(full_name="Aaron Pierskalla", username="aaron_the_king",
              password="Test@1234", email='ajpierskalla3@gmail.com',
-             profile_image_url=defaultPic)
+             profile_image_url=defaultPic),
+        User(full_name="Demo User", username="DemoUser",
+             password="Test@1234", email='demo@isntgram.com',
+             profile_image_url='https://slickpics.s3.us-east-2.amazonaws.com/uploads/MonJul131442162020.png')
     ]
     for i in range(1,50):
         name = fake.name()
