@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
 from ..models import db
 from ..models.posts import Post
@@ -16,11 +17,10 @@ bp = Blueprint("posts", __name__, url_prefix="/api/post")
 def index(length):
     length = int(length)
     post_list = []
-    post_num = Post.query.count()
     posts = []
-    rand_int = randint(1, post_num-3)
-    posts = Post.query.filter(Post.id > rand_int).limit(3).all()
+    posts = Post.query.offset(length).limit(3).all()
     for post in posts:
+        print(f'{length}: {post.id}')
         post_dict = post.to_dict()
         likes = Like.query.filter(
             Like.likeable_id == post_dict["id"] and Like.likeableType == 'post').count()
@@ -36,56 +36,52 @@ def index(length):
 def home_feed(id, length):
     length = int(length)
     post_list = []
-    followed_users = Follow.query.filter(Follow.user_id == id).all()
+    followed_users = Follow.query.filter(Follow.user_followed_id == id).all()
+    follow_list = []
     for followed in followed_users:
-        posts = Post.query.filter(Post.user_id == followed.user_followed_id).slice(length, length + 3)
-        print(len(list(posts)))
-        found_users = {}
-        for post in posts:
-            post_dict = post.to_dict()
-            if post.user_id in found_users:
-                post_dict["user_info"] = found_users[post.user_id]
-            else:
-                user = post.user
-                found_users[post.user_id] = {"username": user.username, "profilePic": user.profile_image_url}
-                post_dict["user_info"] = found_users[post.user_id]
+        followed_dict = followed.to_dict()
+        follow_list.append(followed_dict['user_id'])
+    posts = Post.query.filter(Post.user_id.in_(follow_list)).order_by(desc(Post.created_at)).offset(length).limit(3).all()
+    print(posts)
 
-            likes = Like.query.filter(Like.likeable_id == post.id).filter(Like.likeable_type == 'post').all()
-            post_dict['likeCount'] = len(likes)
-            likes_list = []
-            for like in likes:
-                likes_list.append(like.user.to_dict())
-            post_dict['likesList'] = likes_list
+    for post in posts:
+        post_dict = post.to_dict()
+        user = post.user
+        post_dict["user_info"] = user.to_dict()
 
-            comments = post.comments
-            original_comments = comments
-            if len(comments) > 2:
-                comments = comments[-2:]
-            comments_list = []
-            for comment in comments:
-                comment_dict = comment.to_dict()
-                comment_likes = Like.query.filter(Like.likeable_type == "comment").filter(Like.likeable_id == comment.id).all()
-                user_list = []
-                for like in comment_likes:
-                    username = like.user.to_dict()
-                    user_list.append(username)
+        likes = Like.query.filter(Like.likeable_id == post.id).filter(Like.likeable_type == 'post').all()
+        post_dict['likeCount'] = len(likes)
+        likes_list = []
+        for like in likes:
+            likes_list.append(like.user.to_dict())
+        post_dict['likesList'] = likes_list
 
-                comment_dict['likes_comment'] = user_list
+        comments = post.comments
+        original_comments = comments
+        if len(comments) > 2:
+            comments = comments[-2:]
+        comments_list = []
 
-                if comment.user_id in found_users:
-                    comment_dict["username"] = found_users[comment.user_id]
-                else:
-                    user = comment.user
-                    found_users[user.id] = {"username": user.username, "profilePic": user.profile_image_url}
-                    comment_dict["username"] = found_users[comment.user_id]
+        for comment in comments:
+            comment_dict = comment.to_dict()
+            comment_likes = Like.query.filter(Like.likeable_type == "comment").filter(Like.likeable_id == comment.id).all()
+            user_list = []
 
-                comments_list.append(comment_dict)
+            for like in comment_likes:
+                username = like.user.to_dict()
+                user_list.append(username)
 
-            post_dict["comments"] = {"total": len(original_comments), "commentsList": comments_list }
+            comment_dict['likes_comment'] = user_list
 
-            post_list.append(post_dict)
-            if len(post_list) == 3:
-                return {"posts": post_list}
+            comment_dict["username"] = comment.user.to_dict()
+
+            comments_list.append(comment_dict)
+
+        post_dict["comments"] = {"total": len(original_comments), "commentsList": comments_list}
+        print(post_dict)
+        post_list.append(post_dict)
+        if len(post_list) == 3:
+            return {"posts": post_list}
     return {"posts": post_list}
 
 

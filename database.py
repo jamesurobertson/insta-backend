@@ -1,4 +1,5 @@
 import secrets
+import datetime
 
 from app.models.comments import Comment
 from app.models.saved_posts import Saved_Post
@@ -60,7 +61,9 @@ with app.app_context():
                 continue
             followed_set.add(followed_user_id)
         for j in followed_set:
-            follows.append(Follow(user_id=i, user_followed_id=j))
+            year = randint(2017, 2020)
+            date = datetime.datetime(year, randint(1,12) if year == 2019 else randint(1,6), randint(1,28), randint(0,23), randint(0,59), randint(0,59))
+            follows.append(Follow(user_id=i, user_followed_id=j, created_at=date))
 
 
     posts = []
@@ -68,9 +71,10 @@ with app.app_context():
     for i in range(1, 50):
         num_posts = randint(10, 20)
         for j in range(1, num_posts):
-            randint(1, 1000000)
+            year = randint(2017, 2020)
+            date = datetime.datetime(year, randint(1,12) if year == 2019 else randint(1,6), randint(1,28), randint(0,23), randint(0,59), randint(0,59))
             image = f'https://picsum.photos/seed/{secrets.token_hex(10)}/1000/1000'
-            posts.append(Post(user_id=i, caption=fake.text(), image_url=image))
+            posts.append(Post(user_id=i, caption=fake.text(), image_url=image, created_at=date))
 
 
     comments = []
@@ -78,19 +82,23 @@ with app.app_context():
     for i in range(1, 50):
         comment_count = randint(10, 40)
         for j in range(1, comment_count):
+            year = randint(2017, 2020)
+            date = datetime.datetime(year, randint(1,12) if year == 2019 else randint(1,6), randint(1,28), randint(0,23), randint(0,59), randint(0,59))
             postId = randint(1, len(posts))
-            comments.append(Comment(user_id=i, content=fake.text(), post_id=postId))
+            comments.append(Comment(user_id=i, content=fake.text(), post_id=postId, created_at=date))
 
     likes = []
 
     for i in range(1, 658):
         users_liked_set = set()
         like_post_count = randint(0, 15)
+        year = randint(2017, 2020)
+        date = datetime.datetime(year, randint(1,12) if year == 2019 else randint(1,6), randint(1,28), randint(0,23), randint(0,59), randint(0,59))
         while len(users_liked_set) < like_post_count:
             userId = randint(1, len(users))
             if userId in users_liked_set:
                 continue
-            likes.append(Like(user_id=userId, likeable_id=i, likeable_type='post'))
+            likes.append(Like(user_id=userId, likeable_id=i, likeable_type='post', created_at=date))
             users_liked_set.add(userId)
 
     for user in users:
